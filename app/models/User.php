@@ -79,5 +79,17 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	{
 		return $this->email;
 	}
-
+  
+	public function addNewFromExcel($row)
+	{   
+    try {
+      $id = DB::table('users')->insertGetId(
+          array('email' => $row["site"], 'name' => $row["name"])
+      );
+    }catch(\Exception $e){
+    //Do something when query fails. 
+    }
+	}
+  
+  
 }

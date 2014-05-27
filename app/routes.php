@@ -22,3 +22,5 @@ Route::get('users', function()
 
     return View::make('users')->with('users', $users);
 });
+
+Route::get('ex', 'ExController@showWelcome');
