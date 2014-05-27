@@ -18,21 +18,29 @@ class ExController extends BaseController {
 
 	public function showWelcome()
 	{
-    Excel::load('public/file.xls', function($reader) {
+    Excel::load('public/stores_en.xls', function($reader) {
 
         // // Getting all results
 //         $results = $reader->get();
 // 
 //         $reader->dump();
         
-
         $reader->each(function($row) {
+          
           echo "<pre>";
           print_r($row->all());
           echo "</pre>";
           
+          $t = new Location;
+          $r = $row->all();
+          
+          $t->master_id = $r['yoox_store_source_id'];
+          $t->name = $r['post_title'];
+          $t->sign = $r['wpcf_yoox_store_sign'];
+          $t->save();
+          
           $usernew = new User;
-          $usernew->addNewFromExcel($row->all());
+     //     $usernew->addNewFromExcel($row->all());
 
             
         // Loop through all rows
