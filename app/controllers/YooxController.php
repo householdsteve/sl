@@ -33,9 +33,9 @@ class YooxController extends BaseController {
           
           
           $r = $row->all();
-          $t = Location::firstOrNew(array('master_id' => $r['yoox_store_source_id']));
+          $t = Location::where('master_id', '=', $r['yoox_store_source_id'])->first();
           
-          $t->master_id = $r['yoox_store_source_id'];
+          //$t->master_id = $r['yoox_store_source_id'];
           $t->name = $r['post_title'];
           $t->sign = $r['wpcf_yoox_store_sign'];
           $t->address = $r['wpcf_yoox_store_geolocation_address'];
