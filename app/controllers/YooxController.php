@@ -18,7 +18,7 @@ class YooxController extends BaseController {
 
 	public function import()
 	{
-    Excel::load('public/stores_en.xls', function($reader) {
+    Excel::load('public/stores_it.xls', function($reader) {
 
         // // Getting all results
 //         $results = $reader->get();
@@ -33,11 +33,15 @@ class YooxController extends BaseController {
           
           
           $r = $row->all();
-          $t = Location::where('master_id', '=', $r['yoox_store_source_id'])->first();
+          //$t = Location::where('master_id', '=', $r['yoox_store_source_id'])->first();
+          //$t = Location::firstOrNew(array('master_id' => $r['yoox_store_source_id']));
+          $t = new Location;
           
-          //$t->master_id = $r['yoox_store_source_id'];
+          $t->master_id = $r['yoox_store_source_id'];
           $t->name = $r['post_title'];
           $t->sign = $r['wpcf_yoox_store_sign'];
+          $t->lat = $r['yoox_store_lat'];
+          $t->long = $r['yoox_store_lng'];
           $t->address = $r['wpcf_yoox_store_geolocation_address'];
           $t->city = $r['location_2'];
           $t->country_iso = $r['wpcf_yoox_store_country_iso'];
@@ -49,8 +53,9 @@ class YooxController extends BaseController {
           $t->mtm_store = (!isset($r['wpcf_yoox_store_mtm']) || trim($r['wpcf_yoox_store_mtm'])==='') ? 0 : 1;
           $t->accepts_gift_card = (!isset($r['wpcf_yoox_store_gift_card']) || trim($r['wpcf_yoox_store_gift_card'])==='') ? 0 : 1;
           $t->type = $r['store_types'];
+          $t->type_macro = $r['store_types_macro'];
           $t->brand_type = $r['store_types_general'];
-          $t->relationship = $r['store_types_macro'];
+          $t->relationship = "";
 
           $t->save();
             

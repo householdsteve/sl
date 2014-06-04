@@ -8,6 +8,8 @@ class Location extends Eloquent {
 	 * @var string
 	 */
 	protected $table = 'locations';
+  
+  public static $unguarded = true; // this should be removed when finished with mass assignment or it should be edited to allow certain fields
 
 	/**
 	 * Get the unique identifier for the user.
