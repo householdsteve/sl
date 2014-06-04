@@ -31,8 +31,9 @@ class YooxController extends BaseController {
           print_r($row->all());
           echo "</pre>";
           
-          $t = new Location;
+          
           $r = $row->all();
+          $t = Location::firstOrNew(array('master_id' => $r['yoox_store_source_id']));
           
           $t->master_id = $r['yoox_store_source_id'];
           $t->name = $r['post_title'];
