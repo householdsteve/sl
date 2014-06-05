@@ -15,7 +15,11 @@ class ArmaniController extends BaseController {
 	|	Route::get('/', 'HomeController@showWelcome');
 	|
 	*/
-
+  
+	public function importi()
+	{
+    echo "man";
+  }
 	public function import()
 	{
     Excel::load('public/stores_armani.xls', function($reader) {
