@@ -32,11 +32,11 @@ class YooxController extends BaseController {
           
           $r = $row->all();
           echo "<pre>"; print_r($r); echo "</pre>";
-          //$t = Location::where('master_id', '=', $r['yoox_store_source_id'])->first();
-          $t = Location::firstOrNew(array('master_id' => $r['yoox_store_source_id']));
+          $t = Location::where('master_id', '=', $r['yoox_store_source_id'])->first();
+          //$t = Location::firstOrNew(array('master_id' => $r['yoox_store_source_id']));
           //$t = new Location;
           
-          /* // this is to merge existing brand categories
+           // this is to merge existing brand categories
           $existing_items = unserialize($t->brands_serialized);
           $yb = explode(",",$r['store_brands']);
 
@@ -44,7 +44,7 @@ class YooxController extends BaseController {
             array_merge($existing_items, $yb);
             $t->brands_serialized = serialize($existing_items);
           } 
-          */
+          
           
           // $t->master_id = $r['yoox_store_source_id'];
 //           $t->name = $r['post_title'];

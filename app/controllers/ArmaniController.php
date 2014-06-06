@@ -35,10 +35,12 @@ class ArmaniController extends BaseController {
           $collection_array = [];
           
           $r = $row->all();
-          echo "<pre>"; print_r($r); echo "</pre>";
+          
           
           $t = Location::firstOrNew(array('master_id' => $r['master']));
           //$t = Location::where('master_id', '=', $r['master'])->first();
+          
+          //echo "<pre>"; print_r($t->createCategory()); echo "</pre>";
           
           $t->master_id = $r['master'];
           $t->name = $r['name'];
@@ -66,7 +68,11 @@ class ArmaniController extends BaseController {
           // if(trim($r['cosmetics'])!='') $collection_array[] = 'Armani cosmetics'; // doesnt exist with yoox
           // if(trim($r['libri'])!='') $collection_array[] = 'Armani libri'; // doesnt exist with yoox
           
-          $t->brands_serialized = serialize($collection_array);
+          $createFromName = $t->createCategory($collection_array);
+          //$mergedArray = $t->mergeCategories($collection_array,$createFromName);
+          
+          $t->brands_serialized = serialize($createFromName);
+          $t->last_import_data = serialize($r);
           
           $date = trim($r['data_apertura']);
           $year  = substr($date,0,4);  # extract 4 char starting at position 0.
