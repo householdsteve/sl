@@ -37,21 +37,21 @@ class ArmaniController extends BaseController {
           $r = $row->all();
           
           
-          $t = Location::firstOrNew(array('master_id' => $r['master']));
+          $t = Location::firstOrNew(array('master_id' => $r['cod_cliente_punto_vendita_master']));
           //$t = Location::where('master_id', '=', $r['master'])->first();
           
-          //echo "<pre>"; print_r($t->createCategory()); echo "</pre>";
+          echo "<pre>"; print_r($r); echo "</pre>";
           
-          $t->master_id = $r['master'];
+          $t->master_id = $r['cod_cliente_punto_vendita_master'];
           $t->name = $r['name'];
           $t->sign = $r['sign'];
           $t->address = $r['indirizzo'];
           $t->city = $r['localita'];
           $t->nation_iso3166 = $r['nazione_iso_3166'];
           $t->phone = $r['tel_punto_vendita'];
-          $t->type_macro = $r['tipo_store_macro'];
-          $t->brand_type = $r['tipo_store'];
-          $t->relationship = $r['tipo_rapporto'];
+          $t->type_macro = $r['tipo_punto_vendita_macro'];
+          $t->brand_type = $r['store_types_general'];
+          $t->relationship = $r['tipo_rapporto_ga'];
           
           
           if(trim($r['ac'])!='') $collection_array[] = 'Armani Collezioni';
