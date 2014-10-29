@@ -120,7 +120,7 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
     'Maatwebsite\Excel\ExcelServiceProvider',
-
+    'Propaganistas\LaravelPhone\LaravelPhoneServiceProvider',
 	),
 
 	/*

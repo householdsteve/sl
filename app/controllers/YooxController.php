@@ -15,6 +15,11 @@ class YooxController extends BaseController {
 	|	Route::get('/', 'HomeController@showWelcome');
 	|
 	*/
+  
+	public function merge($lang)
+	{
+    echo $lang;
+  }
 
 	public function import()
 	{

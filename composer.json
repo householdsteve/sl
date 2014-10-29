@@ -7,7 +7,7 @@
     "ext-intl" : "*",
 		"laravel/framework": "4.1.*",
     "maatwebsite/excel": "1.*",
-    "giggsey/libphonenumber-for-php": "~5.9",
+    "giggsey/libphonenumber-for-php": "6.*@dev",
     "propaganistas/laravel-phone": "dev-master"
 	},
 	"autoload": {
