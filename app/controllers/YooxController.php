@@ -15,10 +15,39 @@ class YooxController extends BaseController {
 	|	Route::get('/', 'HomeController@showWelcome');
 	|
 	*/
+  protected $localangvar;
   
 	public function merge($lang)
 	{
-    echo $lang;
+    $this->localangvar = $lang;
+    Excel::load('public/available-languages/stores_'.$lang.'.xls', function($reader) {
+        
+        $reader->each(function($row) {
+        
+          
+          $r = $row->all();
+          
+          $t = Location::where('master_id', '=', $r['yoox_store_source_id'])->first();
+          //$t = Location::firstOrNew(array('master_id' => $r['yoox_store_source_id']));
+          
+          $copied_fields = array(
+              "sign" => "post_title",
+              "wpcf_yoox_store_geolocation_address" => "wpcf_yoox_store_geolocation_address",
+          );
+          
+          foreach($copied_fields as $key => $line){
+            $trans = new Translation;
+            $trans->master_id = $r['yoox_store_source_id'];
+            $trans->key_name_reference = $key;
+            $trans->language = $this->localangvar;
+            $trans->value = $r[$line];
+            echo $trans->master_id." ok! <br>";
+            $trans->save();
+          }
+       
+
+        });
+    });
   }
 
 	public function import()

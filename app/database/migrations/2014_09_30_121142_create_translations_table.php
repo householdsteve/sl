@@ -15,7 +15,7 @@ class CreateTranslationsTable extends Migration {
     Schema::create('translations', function($table)
     {
         $table->increments('id');
-        $table->string('master_id')->unique();
+        $table->string('master_id');
         $table->string('language')->nullable();
         $table->string('key_name_reference')->nullable();
         $table->string('value')->nullable();  
