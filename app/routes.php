@@ -26,3 +26,4 @@ Route::get('users', function()
 Route::get('import-yoox', 'YooxController@import');
 Route::get('import-armani', 'ArmaniController@import');
 Route::get('merge-language/{lang}', 'YooxController@merge');
+Route::get('export-language/{lang}', 'YooxController@export');

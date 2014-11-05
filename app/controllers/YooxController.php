@@ -17,7 +17,36 @@ class YooxController extends BaseController {
 	*/
   protected $localangvar;
   
-	public function merge($lang)
+	public function export($lang)
+	{
+    $this->localangvar = $lang;
+    $translated = Translation::where('language', '=', $this->localangvar)->get();
+    echo "<pre>"; var_dump($translated); echo "</pre>";
+  }
+  
+	public function exports($lang)
+	{
+    $this->localangvar = $lang;
+    
+    Excel::create('export_'.$lang, function($excel) {
+
+        $excel->sheet('Sheetname', function($sheet) {
+
+
+
+          $loc = Location::whereNull('date_closed')->get()->toArray();
+          //echo "<pre>"; var_dump($loc); echo "</pre>";
+            
+            $sheet->fromArray($loc);
+
+        });
+
+    })->download('csv');
+    echo "exported file";
+    
+  }
+  
+  public function merge($lang)
 	{
     $this->localangvar = $lang;
     Excel::load('public/available-languages/stores_'.$lang.'.xls', function($reader) {

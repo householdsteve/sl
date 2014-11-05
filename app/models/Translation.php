@@ -21,5 +21,9 @@ class Translation extends Eloquent {
 		return $this->getKey();
 	}
   
+  public function location()
+  {
+    return $this->belongsTo('Location', 'master_id', 'master_id');
+  }
 
 }

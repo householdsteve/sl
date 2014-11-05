@@ -21,6 +21,13 @@ class Location extends Eloquent {
 		return $this->getKey();
 	}
   
+  
+  public function translation()
+  {
+    return $this->hasMany('Translation', 'master_id', 'master_id');
+  }
+      
+  
 	public function mergeCategories($orig,$updated)
 	{
     if(count($updated) > 0){
