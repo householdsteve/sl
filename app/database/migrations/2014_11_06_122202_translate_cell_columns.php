@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLocationColumnsTestAndPhonevalid extends Migration {
+class TranslateCellColumns extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -13,8 +13,8 @@ class AddLocationColumnsTestAndPhonevalid extends Migration {
 	public function up()
 	{
     Schema::table('locations', function($table) {
-        $table->string('phone_verified')->nullable();
-        $table->text('last_import_data')->nullable();
+        $table->string('co_sign')->nullable()->after("sign");
+        $table->text('column_translations')->nullable()->after("date_closed");
       });
 	}
 
@@ -26,8 +26,8 @@ class AddLocationColumnsTestAndPhonevalid extends Migration {
 	public function down()
 	{
     Schema::table('locations', function($t) {
-        $t->dropColumn('phone_verified');
-        $t->dropColumn('last_import_data');
+        $t->dropColumn('co_sign');
+        $t->dropColumn('column_translations');
     });
 	}
 

@@ -64,16 +64,22 @@ class YooxController extends BaseController {
               "wpcf_yoox_store_geolocation_address" => "wpcf_yoox_store_geolocation_address",
           );
           
+          $translated_fields = (isset($t->column_translations) ? unserialize($t->column_translations) : []);
+          
+          echo "<pre>"; print_r($translated_fields); echo "</pre>";
+          
           foreach($copied_fields as $key => $line){
-            $trans = new Translation;
-            $trans->master_id = $r['yoox_store_source_id'];
-            $trans->key_name_reference = $key;
-            $trans->language = $this->localangvar;
-            $trans->value = $r[$line];
-            echo $trans->master_id." ok! <br>";
-            $trans->save();
+            $translated_fields[$this->localangvar][$key] = $r[$line];
           }
-       
+          
+          if(is_array($translated_fields)){
+            $t->column_translations = serialize($translated_fields);
+          }
+          
+          if($t){ // check to make sure location still exists
+            $t->save();
+          }
+          
 
         });
     });
