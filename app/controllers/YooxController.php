@@ -16,35 +16,62 @@ class YooxController extends BaseController {
 	|
 	*/
   protected $localangvar;
+  protected $export_array = array();
   
 	public function export($lang)
 	{
-    $this->localangvar = $lang;
-    $translated = Translation::where('language', '=', $this->localangvar)->get();
-    echo "<pre>"; var_dump($translated); echo "</pre>";
-  }
-  
-	public function exports($lang)
-	{
-    $this->localangvar = $lang;
+    $this->localangvar = $lang; // the current languge
     
-    Excel::create('export_'.$lang, function($excel) {
+    // these are the keys we should export in excel
+    $export_keys = array("master_id","sign","address","lat","long");
+    //$export_array = array();
+    
+    $translated = Location::whereNull('date_closed')->get();
+    
+    foreach($translated as $key => $v):
+        $location_cached = $v->toArray();
+        $locales = $v->translation()->where('language', '=', $this->localangvar)->get()->toArray();
+        // main loop does all locations and builds new export array.
+        
+        foreach($locales as $k => $val):
+          // second loops overwrites translated variables
+          if (array_key_exists($val['key_name_reference'], $location_cached)) {
+              $location_cached[$val['key_name_reference']] = $val['value'];
+          }
+        endforeach;
+        
+        $localarray = array();
+
+          
+          foreach($export_keys as $name):
+             
+             if (array_key_exists($name, $location_cached)) {
+                 $localarray[$name] = $location_cached[$name];
+                 //echo $location_cached[$name]." replaced <br>";
+             }
+          endforeach;
+        
+        $this->export_array[] = $localarray;
+        
+    endforeach;
+    
+        //echo "<pre>"; print_r($export_array);echo "</pre> --------------------------------------------------------------------------------------------";
+    // outside of this loop create the sheet with the new array we've just created
+    
+    Excel::create('export_'.$this->localangvar, function($excel) {
 
         $excel->sheet('Sheetname', function($sheet) {
 
-
-
-          $loc = Location::whereNull('date_closed')->get()->toArray();
-          //echo "<pre>"; var_dump($loc); echo "</pre>";
             
-            $sheet->fromArray($loc);
+            $sheet->fromArray($this->export_array);
 
         });
 
-    })->download('csv');
-    echo "exported file";
+    })->download('xlsx');
+     echo "exported file";
     
   }
+  
   
   public function merge($lang)
 	{
