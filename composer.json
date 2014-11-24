@@ -5,10 +5,11 @@
 	"license": "MIT",
 	"require": {
     "ext-intl" : "*",
-		"laravel/framework": "4.1.*",
+		"laravel/framework": "4.2.*",
     "maatwebsite/excel": "1.*",
     "giggsey/libphonenumber-for-php": "6.*@dev",
-    "propaganistas/laravel-phone": "dev-master"
+    "propaganistas/laravel-phone": "dev-master",
+		"jenssegers/mongodb": "2.0.0"
 	},
 	"autoload": {
 		"classmap": [

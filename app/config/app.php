@@ -121,6 +121,7 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
     'Maatwebsite\Excel\ExcelServiceProvider',
     'Propaganistas\LaravelPhone\LaravelPhoneServiceProvider',
+    'Jenssegers\Mongodb\MongodbServiceProvider',
 	),
 
 	/*
@@ -186,7 +187,8 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
-    'Excel' => 'Maatwebsite\Excel\Facades\Excel',
+    'Excel'           => 'Maatwebsite\Excel\Facades\Excel',
+    'Moloquent'       => 'Jenssegers\Mongodb\Model',
 
 	),
 

@@ -51,6 +51,15 @@ return array(
 			'database' => __DIR__.'/../database/production.sqlite',
 			'prefix'   => '',
 		),
+    
+    'mongodb' => array(
+        'driver'   => 'mongodb',
+        'host'     => 'localhost',
+        'port'     => 27017,
+        //'username' => 'admin',
+        //'password' => '0123456789',
+        'database' => 'store-locator'
+    ),
 
 		'mysql' => array(
 			'driver'    => 'mysql',

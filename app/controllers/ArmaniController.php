@@ -16,11 +16,24 @@ class ArmaniController extends BaseController {
 	|
 	*/
   
-	public function importi()
+	public function import()
 	{
     echo "man";
+    
+    $obj = Array();
+    $obj['name'] = "coolersss";
+    $obj['sign'] = "maners";
+    
+    DB::collection('locations')->where('name', 'dudes')
+                           ->update($obj, array('upsert' => true));
+    
+    
+    
+    
+    echo "<pre>"; print_r($obj); echo "</pre>";
+    
   }
-	public function import()
+	public function imports()
 	{
     Excel::load('public/stores_armani.xls', function($reader) {
 
@@ -36,7 +49,7 @@ class ArmaniController extends BaseController {
           
           $r = $row->all();
           
-          
+         
           $t = Location::firstOrNew(array('master_id' => $r['cod_cliente_punto_vendita_master']));
           //$t = Location::where('master_id', '=', $r['master'])->first();
           
