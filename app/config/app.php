@@ -121,7 +121,7 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
     'Maatwebsite\Excel\ExcelServiceProvider',
     'Propaganistas\LaravelPhone\LaravelPhoneServiceProvider',
-    'Jenssegers\Mongodb\MongodbServiceProvider',
+    //'Jenssegers\Mongodb\MongodbServiceProvider',
 	),
 
 	/*

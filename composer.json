@@ -7,9 +7,9 @@
     "ext-intl" : "*",
 		"laravel/framework": "4.2.*",
     "maatwebsite/excel": "1.*",
+    "unikent/curl": "dev-master",
     "giggsey/libphonenumber-for-php": "6.*@dev",
-    "propaganistas/laravel-phone": "dev-master",
-		"jenssegers/mongodb": "2.0.0"
+    "propaganistas/laravel-phone": "dev-master"
 	},
 	"autoload": {
 		"classmap": [

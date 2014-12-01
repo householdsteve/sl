@@ -33,6 +33,27 @@ class ArmaniController extends BaseController {
     echo "<pre>"; print_r($obj); echo "</pre>";
     
   }
+  public function geocode()
+  {
+    $locs = Location::whereNull('lat')->take(10)->get();
+    foreach($locs as $key => $v):
+       
+      $locationaddress = $v->address." ".$v->city.", ".$v->nation_iso3166;
+      $this->curl = New Curl;
+      $locationobject = $this->curl->simple_get('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($locationaddress).'&sensor=false&key=AIzaSyAtiEkSR9a6K2Ih-avv8Meu_N8SpEgOK9g');
+      $nn = json_decode($locationobject);
+      
+      if(count($nn->results) > 0){
+        echo $v->address." ".$v->city.", ".$v->nation_iso3166."<br>";
+        echo "<pre>"; print_r($nn);echo "</pre> --------------------------------------------------------------------------------------------";
+      }
+      //echo $nn->results[0]->geometry->location->lat."<br>";
+      //echo $nn->results[0]->geometry->location->lng;
+    endforeach;
+   
+    
+    
+  }
 	public function imports()
 	{
     Excel::load('public/stores_armani.xls', function($reader) {

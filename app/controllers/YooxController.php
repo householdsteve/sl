@@ -23,7 +23,28 @@ class YooxController extends BaseController {
     $this->localangvar = $lang; // the current languge
     
     // these are the keys we should export in excel
-    $export_keys = array("master_id","sign","address","lat","long");
+    $export_keys = array(
+      "master_id" => array(
+        "column_name" => "_yoox-store-source-id",
+        "process_method" => "test"
+      ),
+      "sign" => array(
+        "column_name" => "post_title",
+        "process_method" => "test"
+      ),
+      "address" => array(
+        "column_name" => "wpcf-yoox-store-geolocation-address",
+        "process_method" => "test"
+      ),
+      "lat" => array(
+        "column_name" => "_yoox-store-lat",
+        "process_method" => "test"
+      ),
+      "long" => array(
+        "column_name" => "_yoox-store-lng",
+        "process_method" => "test"
+      )
+    );
     //$export_array = array();
     
     $translated = Location::whereNull('date_closed')->get();
@@ -43,11 +64,11 @@ class YooxController extends BaseController {
         $localarray = array();
 
           
-          foreach($export_keys as $name):
-             
-             if (array_key_exists($name, $location_cached)) {
-                 $localarray[$name] = $location_cached[$name];
-                 //echo $location_cached[$name]." replaced <br>";
+          foreach($export_keys as $lkey => $name):
+            
+             if (array_key_exists($lkey, $location_cached)) {
+                 $localarray[$name['column_name']] = $location_cached[$lkey];
+                 //echo $location_cached[$lkey]." replaced <br>";
              }
           endforeach;
         
