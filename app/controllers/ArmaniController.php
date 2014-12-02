@@ -44,11 +44,17 @@ class ArmaniController extends BaseController {
       $nn = json_decode($locationobject);
       
       if(count($nn->results) > 0){
+        $updatedloc = Location::find($v->id);
+        $updatedloc->lat = $nn->results[0]->geometry->location->lat;
+        $updatedloc->long = $nn->results[0]->geometry->location->lng;
+        $updatedloc->save();
+        
         echo $v->address." ".$v->city.", ".$v->nation_iso3166."<br>";
+        echo $nn->results[0]->geometry->location->lat."<br>";
+        echo $nn->results[0]->geometry->location->lng;
         echo "<pre>"; print_r($nn);echo "</pre> --------------------------------------------------------------------------------------------";
       }
-      //echo $nn->results[0]->geometry->location->lat."<br>";
-      //echo $nn->results[0]->geometry->location->lng;
+      
     endforeach;
    
     
