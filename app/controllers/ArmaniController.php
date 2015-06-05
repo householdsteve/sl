@@ -48,10 +48,10 @@ class ArmaniController extends BaseController {
     echo $locs->count();
     foreach($locs as $key => $v):
 
-      if(isset($v->country_iso) && $v->phone_verified == NULL):
+      if(isset($v->country_iso_verified) && $v->phone_verified == NULL):
         
         try {
-            $numberProto = $phoneUtils->parse($v->phone, $v->country_iso);
+            $numberProto = $phoneUtils->parse($v->phone, $v->country_iso_verified);
 
             $updated_phone = $phoneUtils->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
             echo $updated_phone."<br>";
@@ -73,10 +73,10 @@ class ArmaniController extends BaseController {
   
   public function geocode()
   {
-    $locs = Location::whereNull('lat')->take(10)->get();
+    $locs = Location::whereNull('lat')->get();
     foreach($locs as $key => $v):
        
-      $locationaddress = $v->address." ".$v->city.", ".$v->nation_iso3166;
+      $locationaddress = $v->address." ".$v->city.", ".$v->nation_verified;
       $this->curl = New Curl;
       $locationobject = $this->curl->simple_get('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($locationaddress).'&sensor=false&key=AIzaSyAtiEkSR9a6K2Ih-avv8Meu_N8SpEgOK9g');
       $nn = json_decode($locationobject);
@@ -87,7 +87,7 @@ class ArmaniController extends BaseController {
         $updatedloc->long = $nn->results[0]->geometry->location->lng;
         $updatedloc->save();
         
-        echo $v->address." ".$v->city.", ".$v->nation_iso3166."<br>";
+        echo $v->address." ".$v->city.", ".$v->nation_verified."<br>";
         echo $nn->results[0]->geometry->location->lat."<br>";
         echo $nn->results[0]->geometry->location->lng;
         echo "<pre>"; print_r($nn);echo "</pre> --------------------------------------------------------------------------------------------";
@@ -101,19 +101,21 @@ class ArmaniController extends BaseController {
   
   public function fix_country()
   {
-    $locs = Location::whereNull('country_iso')->get();
+    $locs = Location::whereNull('country_iso_verified')->get();
     foreach($locs as $key => $v):
        
       $locationaddress = $v->address." ".$v->city.", ".$v->nation_iso3166;
       echo "<pre>"; print_r($locationaddress);echo "</pre> --------------------------------------------------------------------------------------------";
       $this->curl = New Curl;
-      $locationobject = $this->curl->simple_get('http://api.geonames.org/searchJSON?q='.urlencode($v->nation_iso3166).'&maxRows=10&username=steve');
+      $locationobject = $this->curl->simple_get('http://api.geonames.org/searchJSON?q='.urlencode($v->nation_iso3166).'&maxRows=1&username=steve');
       $nn = json_decode($locationobject);
       echo "<pre>"; print_r($nn);echo "</pre> --------------------------------------------------------------------------------------------";
       if(count($nn->geonames) > 0){
 
         $updatedloc = Location::find($v->id);
-        $updatedloc->country_iso = $nn->geonames[0]->countryCode;
+        //$updatedloc->country_iso = $nn->geonames[0]->countryCode;
+        $updatedloc->country_iso_verified = $nn->geonames[0]->countryCode;
+        $updatedloc->nation_verified = $nn->geonames[0]->countryName;
 
         $updatedloc->save();
 
@@ -188,14 +190,14 @@ class ArmaniController extends BaseController {
           $month = substr($date,4,2);  # extract 2 char starting at position 4.
           $day   = substr($date,6);
 
-          if(!isset($r['opening_date']) || trim($r['opening_date'])==='') $t->date_opened = date('Y-m-d H:i:s', mktime(0, 0, 0, $month, $day, $year));
+          if(isset($r['opening_date'])) $t->date_opened = date('Y-m-d H:i:s', mktime(0, 0, 0, $month, $day, $year));
           
           $datec = trim($r['closing_date']);
           $yearc  = substr($datec,0,4);  # extract 4 char starting at position 0.
           $monthc = substr($datec,4,2);  # extract 2 char starting at position 4.
           $dayc   = substr($datec,6);
 
-          if(!isset($r['closing_date']) || trim($r['closing_date'])==='') $t->date_closed = date('Y-m-d H:i:s', mktime(0, 0, 0, $monthc, $dayc, $yearc));
+          if(isset($r['closing_date']) && $r['closing_date'] != '47121231') $t->date_closed = date('Y-m-d H:i:s', mktime(0, 0, 0, $monthc, $dayc, $yearc));
 
           $t->save();
             
