@@ -67,6 +67,7 @@ return array(
 			'database'  => 'storelocator',
 			'username'  => 'stevemc',
 			'password'  => 'borgo18',
+      //'unix_socket'   => '/Applications/MAMP/tmp/mysql/mysql.sock',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

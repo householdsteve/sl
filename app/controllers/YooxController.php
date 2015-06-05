@@ -94,7 +94,7 @@ class YooxController extends BaseController {
   }
   
   
-  public function merge($lang)
+  public function merge($lang="it")
 	{
     $this->localangvar = $lang;
     Excel::load('public/available-languages/stores_'.$lang.'.xls', function($reader) {
@@ -179,12 +179,13 @@ class YooxController extends BaseController {
 //           $t->relationship = "";
 
           $t->save();
+          echo "things are cool";
             
         }
         // Loop through all rows
-          $row->each(function($cell) {
-            
-          });
+          // $row->each(function($cell) {
+//
+//           });
 
         });
     });

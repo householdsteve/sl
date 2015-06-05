@@ -16,7 +16,7 @@ class ArmaniController extends BaseController {
 	|
 	*/
   
-	public function import()
+	public function imports()
 	{
     echo "man";
     
@@ -33,6 +33,44 @@ class ArmaniController extends BaseController {
     echo "<pre>"; print_r($obj); echo "</pre>";
     
   }
+  
+	public function phone()
+	{
+    
+    $phoneUtils = \libphonenumber\PhoneNumberUtil::getInstance();
+        
+       
+        
+    //echo phone_format("248 982 4247", "US");
+    
+    //$locs = Location::whereNotNull('phone')->get();
+    $locs = Location::all();
+    echo $locs->count();
+    foreach($locs as $key => $v):
+
+      if(isset($v->country_iso) && $v->phone_verified == NULL):
+        
+        try {
+            $numberProto = $phoneUtils->parse($v->phone, $v->country_iso);
+
+            $updated_phone = $phoneUtils->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
+            echo $updated_phone."<br>";
+            $updatedloc = Location::find($v->id);
+            $updatedloc->phone_verified = $updated_phone;
+            $updatedloc->save();
+            
+        } catch (\libphonenumber\NumberParseException $e) {
+            //echo "<pre>"; print_r($e); echo "</pre> --------------------------------------------------------------------------------------------";
+        }
+
+      endif;  
+    endforeach;
+    
+    
+  }
+  
+  
+  
   public function geocode()
   {
     $locs = Location::whereNull('lat')->take(10)->get();
@@ -60,7 +98,38 @@ class ArmaniController extends BaseController {
     
     
   }
-	public function imports()
+  
+  public function fix_country()
+  {
+    $locs = Location::whereNull('country_iso')->get();
+    foreach($locs as $key => $v):
+       
+      $locationaddress = $v->address." ".$v->city.", ".$v->nation_iso3166;
+      echo "<pre>"; print_r($locationaddress);echo "</pre> --------------------------------------------------------------------------------------------";
+      $this->curl = New Curl;
+      $locationobject = $this->curl->simple_get('http://api.geonames.org/searchJSON?q='.urlencode($v->nation_iso3166).'&maxRows=10&username=steve');
+      $nn = json_decode($locationobject);
+      echo "<pre>"; print_r($nn);echo "</pre> --------------------------------------------------------------------------------------------";
+      if(count($nn->geonames) > 0){
+
+        $updatedloc = Location::find($v->id);
+        $updatedloc->country_iso = $nn->geonames[0]->countryCode;
+
+        $updatedloc->save();
+
+        echo "cool";
+        //echo "<pre>"; print_r($nn);echo "</pre> --------------------------------------------------------------------------------------------";
+
+      }
+      
+    endforeach;
+   
+    
+    
+  }
+  
+  
+	public function import()
 	{
     Excel::load('public/stores_armani.xls', function($reader) {
 
@@ -76,24 +145,24 @@ class ArmaniController extends BaseController {
           
           $r = $row->all();
           
+         echo "<pre>"; print_r($r);echo "</pre> --------------------------------------------------------------------------------------------";
          
-          $t = Location::firstOrNew(array('master_id' => $r['cod_cliente_punto_vendita_master']));
+          $t = Location::firstOrNew(array('master_id' => $r['aam_code']));
           //$t = Location::where('master_id', '=', $r['master'])->first();
-          
-          echo "<pre>"; print_r($r); echo "</pre>";
-          
-          $t->master_id = $r['cod_cliente_punto_vendita_master'];
-          $t->name = $r['name'];
+
+
+          $t->master_id = $r['aam_code'];
+          $t->name = $r['sales_point_name'];
           $t->sign = $r['sign'];
-          $t->address = $r['indirizzo'];
-          $t->city = $r['localita'];
-          $t->nation_iso3166 = $r['nazione_iso_3166'];
-          $t->phone = $r['tel_punto_vendita'];
-          $t->type_macro = $r['tipo_punto_vendita_macro'];
-          $t->brand_type = $r['store_types_general'];
-          $t->relationship = $r['tipo_rapporto_ga'];
-          
-          
+          $t->address = $r['address'];
+          $t->city = $r['city'];
+          $t->nation_iso3166 = $r['nation'];
+          $t->phone = $r['thelephone_n0'];
+          $t->type_macro = $r['tipo'];
+          $t->brand_type = $r['type_of_store'];
+          $t->relationship = $r['relationship_kind'];
+
+
           if(trim($r['ac'])!='') $collection_array[] = 'Armani Collezioni';
           if(trim($r['ea'])!='') $collection_array[] = 'Emporio Armani';
           if(trim($r['ea7'])!='') $collection_array[] = 'EA7';
@@ -107,19 +176,26 @@ class ArmaniController extends BaseController {
           // if(trim($r['orologi_gioielli'])!='') $collection_array[] = 'Armani orologi_gioielli'; // doesnt exist with yoox
           // if(trim($r['cosmetics'])!='') $collection_array[] = 'Armani cosmetics'; // doesnt exist with yoox
           // if(trim($r['libri'])!='') $collection_array[] = 'Armani libri'; // doesnt exist with yoox
-          
+
           $createFromName = $t->createCategory($collection_array);
           //$mergedArray = $t->mergeCategories($collection_array,$createFromName);
-          
+
           $t->brands_serialized = serialize($createFromName);
           $t->last_import_data = serialize($r);
-          
-          $date = trim($r['data_apertura']);
+
+          $date = trim($r['opening_date']);
           $year  = substr($date,0,4);  # extract 4 char starting at position 0.
           $month = substr($date,4,2);  # extract 2 char starting at position 4.
           $day   = substr($date,6);
+
+          if(!isset($r['opening_date']) || trim($r['opening_date'])==='') $t->date_opened = date('Y-m-d H:i:s', mktime(0, 0, 0, $month, $day, $year));
           
-          if(!isset($r['data_apertura']) || trim($r['data_apertura'])==='') $t->date_opened = date('Y-m-d H:i:s', mktime(0, 0, 0, $month, $day, $year));
+          $datec = trim($r['closing_date']);
+          $yearc  = substr($datec,0,4);  # extract 4 char starting at position 0.
+          $monthc = substr($datec,4,2);  # extract 2 char starting at position 4.
+          $dayc   = substr($datec,6);
+
+          if(!isset($r['closing_date']) || trim($r['closing_date'])==='') $t->date_closed = date('Y-m-d H:i:s', mktime(0, 0, 0, $monthc, $dayc, $yearc));
 
           $t->save();
             
@@ -127,6 +203,40 @@ class ArmaniController extends BaseController {
           $row->each(function($cell) {
             
           });
+
+        });
+        
+    });
+	}
+  
+	public function import_signs()
+	{
+    Excel::load('public/stores_armani_signs.xls', function($reader) {
+
+        // // Getting all results
+//         $results = $reader->get();
+// 
+//         $reader->dump();
+        
+        
+        $reader->each(function($row) {
+          
+
+          
+          $r = $row->all();
+          
+          if(isset($r['id_entity'])):
+          //$t = Location::firstOrNew(array('master_id' => $r['id_entity']));
+          $t = Location::where('master_id', '=', $r['id_entity'])->first();
+          
+            if($t):
+              echo "<pre>"; print_r($r); echo "</pre>";
+          
+              $t->co_sign = $r['accompanying_name'];
+              $t->address = $r['address'];
+              $t->save();
+            endif;
+          endif;
 
         });
         
