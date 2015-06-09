@@ -69,6 +69,77 @@ class ArmaniController extends BaseController {
     
   }
   
+	public function genderizer()
+	{
+    
+    $gender_keys = array(
+      "en" => array(
+        "man" => "MAN",
+        "woman" => "WOMAN",
+        "accessories" => "ACCESSORIES",
+        "prepend" => false
+      ),
+      "cn" => array(
+        "man" => "男士",
+        "woman" => "女士",
+        "accessories" => "配饰",
+        "prepend" => false
+      ),
+      "jp" => array(
+        "man" => "MAN",
+        "woman" => "WOMAN",
+        "accessories" => "ACCESSORIES",
+        "prepend" => false
+      ),
+      "ru" => array(
+        "man" => "МУЖСКОЙ БУТИК",
+        "woman" => "ЖЕНСКИЙ БУТИК",
+        "accessories" => "АКСЕССУАРЫ",
+        "prepend" => true
+      ),
+      "fr" => array(
+        "man" => "HOMME",
+        "woman" => "FEMME",
+        "accessories" => "ACCESSOIRES",
+        "prepend" => false
+      ),
+      "it" => array(
+        "man" => "UOMO",
+        "woman" => "DONNA",
+        "accessories" => "ACCESSORI",
+        "prepend" => false
+      ),
+      "de" => array(
+        "man" => "HERREN",
+        "woman" => "DAMEN",
+        "accessories" => "ACCESSORIES",
+        "prepend" => false
+      )
+    );
+    
+    $locs = Location::all();
+    echo $locs->count();
+    
+    
+    
+    foreach($locs as $key => $v):
+      $lvar = null;
+      
+      // used this code to set database tables
+      foreach($gender_keys["it"] as $k => $val):
+        if(str_contains($v->sign,$val)) $lvar = $k;
+        echo $v->id." ".$lvar."<br>";
+      endforeach;
+      $updatedloc = Location::find($v->id);
+      $updatedloc->sign_translation_key = $lvar;
+      $updatedloc->save();
+            
+
+    endforeach;
+    
+    
+  }
+  
   
   
   public function geocode()

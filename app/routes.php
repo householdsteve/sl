@@ -29,5 +29,6 @@ Route::get('import-signs', 'ArmaniController@import_signs');
 Route::get('update-phone', 'ArmaniController@phone');
 Route::get('fix-country', 'ArmaniController@fix_country');
 Route::get('geocode', 'ArmaniController@geocode');
+Route::get('genderizer', 'ArmaniController@genderizer');
 Route::get('merge-language/{lang}', 'YooxController@merge');
 Route::get('export-language/{lang}', 'YooxController@export');
