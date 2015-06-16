@@ -26,27 +26,92 @@ class YooxController extends BaseController {
     $export_keys = array(
       "master_id" => array(
         "column_name" => "_yoox-store-source-id",
-        "process_method" => "test"
+        "process_method" => NULL
       ),
-      "sign" => array(
+      "sign_pre_translation" => array(
         "column_name" => "post_title",
-        "process_method" => "test"
+        "process_method" => "add_translated_store_name"
+      ),
+      "url_slug" => array(
+        "column_name" => "post_name",
+        "process_method" => "create_post_slug"
       ),
       "address" => array(
         "column_name" => "wpcf-yoox-store-geolocation-address",
-        "process_method" => "test"
+        "process_method" => NULL
       ),
       "lat" => array(
         "column_name" => "_yoox-store-lat",
-        "process_method" => "test"
+        "process_method" => NULL
       ),
       "long" => array(
         "column_name" => "_yoox-store-lng",
-        "process_method" => "test"
-      )
+        "process_method" => NULL
+      ),
+      "phone_verified" => array(
+        "column_name" => "wpcf-yoox-store-phone",
+        "process_method" => NULL
+      ),
+      "co_sign" => array(
+        "column_name" => "wpcf-yoox-store-sign",
+        "process_method" => NULL
+      ),
+      "email" => array(
+        "column_name" => "wpcf-yoox-store-email",
+        "process_method" => NULL
+      ),
+      "hours" => array(
+        "column_name" => "wpcf-yoox-store-hours",
+        "process_method" => NULL
+      ),
+      "email_mtm_store_manager" => array(
+        "column_name" => "wpcf-yoox-store-mtm-store-manager-email",
+        "process_method" => NULL
+      ),
+      "email_mtm_area_manager" => array(
+        "column_name" => "wpcf-yoox-store-mtm-area-manager-email",
+        "process_method" => NULL
+      ),
+      "mtm_store" => array(
+        "column_name" => "wpcf-yoox-store-mtm",
+        "process_method" => NULL
+      ),
+      "accepts_gift_card" => array(
+        "column_name" => "wpcf-yoox-store-gift-card",
+        "process_method" => NULL
+      ),
+      "country_iso_verified" => array(
+        "column_name" => "wpcf-yoox-store-country-iso",
+        "process_method" => NULL
+      ),
+      "type_macro" => array(
+        "column_name" => "store-types-macro",
+        "process_method" => NULL
+      ),
+      "type" => array(
+        "column_name" => "store-types",
+        "process_method" => NULL
+      ),
+      "brand_type" => array(
+        "column_name" => "store-types-general",
+        "process_method" => NULL
+      ),
+      "nation_iso3166" => array(
+        "column_name" => "location_1",
+        "process_method" => NULL
+      ),
+      "city" => array(
+        "column_name" => "location_2",
+        "process_method" => NULL
+      ),
+      "brands_serialized" => array(
+        "column_name" => "store-brands",
+        "process_method" => "prepare_store_brands"
+      )                                                
     );
     //$export_array = array();
     
+    //$translated = Location::whereNull('date_closed')->take(10)->get();
     $translated = Location::whereNull('date_closed')->get();
     
     foreach($translated as $key => $v):
@@ -64,13 +129,18 @@ class YooxController extends BaseController {
         $localarray = array();
 
           
-          foreach($export_keys as $lkey => $name):
-            
-             if (array_key_exists($lkey, $location_cached)) {
-                 $localarray[$name['column_name']] = $location_cached[$lkey];
-                 //echo $location_cached[$lkey]." replaced <br>";
-             }
-          endforeach;
+        foreach($export_keys as $lkey => $name):
+             $func = $name['process_method'];
+             $local_val = (array_key_exists($lkey, $location_cached)) ? $location_cached[$lkey] : $lkey;
+             
+             if(isset($func) && method_exists($this,$func)): 
+                 $nv = $this->$func($local_val,$location_cached); // pass in the object too to get additional characteristics from location  
+                 $localarray[$name['column_name']] = $nv;
+             else:
+                 $localarray[$name['column_name']] = $local_val;
+             endif;
+             
+        endforeach;
         
         $this->export_array[] = $localarray;
         
@@ -94,6 +164,80 @@ class YooxController extends BaseController {
   }
   
   
+  public function prepare_store_brands($f,$o)
+  {
+        $val = unserialize($f);
+        return implode(",",$val);
+  }
+  
+	public function create_post_slug($f,$o)
+	{
+      $title = $o["sign_pre_translation"]." ".((isset($o["sign_translation_key"])) ? $o["sign_translation_key"].' ' : '').$o["address"]." ".$o["city"];
+      $slug = Str::slug($title);
+      return $slug;
+  }
+  
+  
+	public function add_translated_store_name($f,$o)
+	{
+    $gender_keys = array(
+      "en" => array(
+        "man" => "MAN",
+        "woman" => "WOMAN",
+        "accessories" => "ACCESSORIES",
+        "prepend" => false
+      ),
+      "cn" => array(
+        "man" => "男士",
+        "woman" => "女士",
+        "accessories" => "配饰",
+        "prepend" => false
+      ),
+      "jp" => array(
+        "man" => "MAN",
+        "woman" => "WOMAN",
+        "accessories" => "ACCESSORIES",
+        "prepend" => false
+      ),
+      "ru" => array(
+        "man" => "МУЖСКОЙ БУТИК",
+        "woman" => "ЖЕНСКИЙ БУТИК",
+        "accessories" => "АКСЕССУАРЫ",
+        "prepend" => true
+      ),
+      "fr" => array(
+        "man" => "HOMME",
+        "woman" => "FEMME",
+        "accessories" => "ACCESSOIRES",
+        "prepend" => false
+      ),
+      "it" => array(
+        "man" => "UOMO",
+        "woman" => "DONNA",
+        "accessories" => "ACCESSORI",
+        "prepend" => false
+      ),
+      "de" => array(
+        "man" => "HERREN",
+        "woman" => "DAMEN",
+        "accessories" => "ACCESSORIES",
+        "prepend" => false
+      )
+    );
+    
+
+    if($gender_keys[$this->localangvar]["prepend"]){
+      $val = (isset($gender_keys[$this->localangvar][$o["sign_translation_key"]])) ? $gender_keys[$this->localangvar][$o["sign_translation_key"]]." ".$f : $f;
+    }else{
+      $val = (isset($gender_keys[$this->localangvar][$o["sign_translation_key"]])) ? $f.$gender_keys[$this->localangvar][$o["sign_translation_key"]] : $f;
+    }
+      $val = ucwords(strtolower($val));
+
+    return $val;
+  }
+  
+  
+  
   public function merge($lang="it")
 	{
     $this->localangvar = $lang;
@@ -108,8 +252,8 @@ class YooxController extends BaseController {
           //$t = Location::firstOrNew(array('master_id' => $r['yoox_store_source_id']));
           
           $copied_fields = array(
-              "sign" => "post_title",
-              "address" => "wpcf_yoox_store_geolocation_address",
+              //"sign" => "post_title",
+              "address" => "wpcf_yoox_store_geolocation_address"
           );
           
           foreach($copied_fields as $key => $line){
