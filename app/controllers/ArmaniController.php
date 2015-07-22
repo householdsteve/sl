@@ -409,6 +409,44 @@ class ArmaniController extends BaseController {
     
   }
   
+  public function fix_mtm()
+  {
+    $locs = Location::whereNotNull('mtm_store')->get();
+    foreach($locs as $key => $v):
+       
+      if(!isset($v->email_mtm_area_manager)){
+
+        $updatedloc = Location::find($v->id);
+        $updatedloc->mtm_store = NULL;
+        $updatedloc->save();
+
+        echo "<pre>"; print_r($v->name);echo "</pre> --------------------------------------------------------------------------------------------";
+
+     }
+      
+    endforeach;
+   
+    
+    
+  }
+  
+  public function fix_store_type()
+  {
+    // this was used to match the correct types of type with type_macro which arn't always defined or the same. consider running this after partrizia's update.
+    $locs = Location::where('type_macro',"=", "RESTAURANT")->get();
+    foreach($locs as $key => $v):
+
+        echo "<pre>"; print_r($v->type_macro);echo "</pre> --------------------------------------------------------------------------------------------";
+        $v->type = "RESTAURANT";
+        $v->save();
+
+      
+    endforeach;
+   
+    
+    
+  }
+  
   
 	public function import()
 	{

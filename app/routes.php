@@ -32,6 +32,9 @@ Route::get('fix-country', 'ArmaniController@fix_country');
 Route::get('geocode', 'ArmaniController@geocode');
 Route::get('genderizer', 'ArmaniController@genderizer');
 Route::get('postal', 'ArmaniController@create_postalcodes');
+Route::get('mtm', 'ArmaniController@fix_mtm');
+Route::get('type', 'ArmaniController@fix_store_type');
+
 
 Route::get('merge-language/{lang}', 'YooxController@merge');
 Route::get('export-language/{lang}', 'YooxController@export');
