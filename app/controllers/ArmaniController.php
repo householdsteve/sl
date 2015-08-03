@@ -229,19 +229,19 @@ class ArmaniController extends BaseController {
     echo $locs->count();
     foreach($locs as $key => $v):
 
-      if(isset($v->country_iso_verified) && $v->phone_verified == NULL):
-        
+      //if(isset($v->country_iso_verified) && $v->phone_verified == NULL):
+      if(isset($v->country_iso_verified)):
         try {
             $numberProto = $phoneUtils->parse($v->phone, $v->country_iso_verified);
 
             $updated_phone = $phoneUtils->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
-            echo $updated_phone."<br>";
+            //echo $updated_phone."<br>";
             $updatedloc = Location::find($v->id);
             $updatedloc->phone_verified = $updated_phone;
             $updatedloc->save();
             
         } catch (\libphonenumber\NumberParseException $e) {
-            //echo "<pre>"; print_r($e); echo "</pre> --------------------------------------------------------------------------------------------";
+            echo "<pre> master id: ".$v->master_id." : country: ".$v->country_iso_verified; echo "</pre> --------------------------------------------------------------------------------------------";
         }
 
       endif;  
@@ -448,7 +448,7 @@ class ArmaniController extends BaseController {
   }
   
   
-	public function import()
+	public function import1()
 	{
     Excel::load('public/stores_armani.xls', function($reader) {
 
@@ -480,6 +480,79 @@ class ArmaniController extends BaseController {
           $t->type_macro = $r['tipo'];
           $t->brand_type = $r['type_of_store'];
           $t->relationship = $r['relationship_kind'];
+
+
+          if(trim($r['ac'])) $collection_array[] = 'Armani Collezioni';
+          if(trim($r['ea'])) $collection_array[] = 'Emporio Armani';
+          if(trim($r['ea7'])) $collection_array[] = 'EA7';
+          if(trim($r['aj'])) $collection_array[] = 'Armani Jeans';
+          if(trim($r['aju'])) $collection_array[] = 'Armani Junior';
+          if(trim($r['casa'])) $collection_array[] = 'Armani Casa';
+          if(trim($r['ga'])) $collection_array[] = 'Giorgio Armani';
+          if(trim($r['fiori'])) $collection_array[] = 'Armani Fiori';
+          if(trim($r['dolci'])) $collection_array[] = 'Armani Dolci';
+          // if(trim($r['occhiali'])) $collection_array[] = 'Armani Eyewear'; // doesnt exist with yoox
+          // if(trim($r['orologi_gioielli'])) $collection_array[] = 'Armani orologi_gioielli'; // doesnt exist with yoox
+          // if(trim($r['cosmetics'])) $collection_array[] = 'Armani cosmetics'; // doesnt exist with yoox
+          // if(trim($r['libri'])) $collection_array[] = 'Armani libri'; // doesnt exist with yoox
+
+          $createFromName = $t->createCategory($collection_array);
+          //$mergedArray = $t->mergeCategories($collection_array,$createFromName);
+
+          $t->brands_serialized = serialize($createFromName);
+          $t->last_import_data = serialize($r);
+
+          $date = trim($r['opening_date']);
+          $year  = substr($date,0,4);  # extract 4 char starting at position 0.
+          $month = substr($date,4,2);  # extract 2 char starting at position 4.
+          $day   = substr($date,6);
+
+          if(isset($r['opening_date'])) $t->date_opened = date('Y-m-d H:i:s', mktime(0, 0, 0, $month, $day, $year));
+          
+          $datec = trim($r['closing_date']);
+          $yearc  = substr($datec,0,4);  # extract 4 char starting at position 0.
+          $monthc = substr($datec,4,2);  # extract 2 char starting at position 4.
+          $dayc   = substr($datec,6);
+
+          if(isset($r['closing_date']) && $r['closing_date'] != '47121231') $t->date_closed = date('Y-m-d H:i:s', mktime(0, 0, 0, $monthc, $dayc, $yearc));
+
+          $t->save();
+            
+        // Loop through all rows
+          $row->each(function($cell) {
+            
+          });
+
+        });
+        
+    });
+	}
+  
+	public function import()
+	{
+    Excel::load('public/japan729.xls', function($reader) {
+
+        // // Getting all results
+//         $results = $reader->get();
+// 
+//         $reader->dump();
+        
+        
+        $reader->each(function($row) {
+          
+          $collection_array = [];
+          
+          $r = $row->all();
+          
+         echo "<pre>"; print_r($r);echo "</pre> --------------------------------------------------------------------------------------------";
+         
+          $t = Location::firstOrNew(array('master_id' => $r['aam_code']));
+          //$t = Location::where('master_id', '=', $r['master'])->first();
+
+
+          $t->master_id = $r['aam_code'];
+          $t->address = $r['address'];
+          $t->phone = $r['thelephone_n0'];
 
 
           if(trim($r['ac'])) $collection_array[] = 'Armani Collezioni';
