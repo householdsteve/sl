@@ -530,7 +530,7 @@ class ArmaniController extends BaseController {
   
 	public function import()
 	{
-    Excel::load('public/japan729.xls', function($reader) {
+    Excel::load('public/mtm0308.xls', function($reader) {
 
         // // Getting all results
 //         $results = $reader->get();
@@ -546,50 +546,22 @@ class ArmaniController extends BaseController {
           
          echo "<pre>"; print_r($r);echo "</pre> --------------------------------------------------------------------------------------------";
          
-          $t = Location::firstOrNew(array('master_id' => $r['aam_code']));
-          //$t = Location::where('master_id', '=', $r['master'])->first();
-
-
-          $t->master_id = $r['aam_code'];
-          $t->address = $r['address'];
-          $t->phone = $r['thelephone_n0'];
-
-
-          if(trim($r['ac'])) $collection_array[] = 'Armani Collezioni';
-          if(trim($r['ea'])) $collection_array[] = 'Emporio Armani';
-          if(trim($r['ea7'])) $collection_array[] = 'EA7';
-          if(trim($r['aj'])) $collection_array[] = 'Armani Jeans';
-          if(trim($r['aju'])) $collection_array[] = 'Armani Junior';
-          if(trim($r['casa'])) $collection_array[] = 'Armani Casa';
-          if(trim($r['ga'])) $collection_array[] = 'Giorgio Armani';
-          if(trim($r['fiori'])) $collection_array[] = 'Armani Fiori';
-          if(trim($r['dolci'])) $collection_array[] = 'Armani Dolci';
-          // if(trim($r['occhiali'])) $collection_array[] = 'Armani Eyewear'; // doesnt exist with yoox
-          // if(trim($r['orologi_gioielli'])) $collection_array[] = 'Armani orologi_gioielli'; // doesnt exist with yoox
-          // if(trim($r['cosmetics'])) $collection_array[] = 'Armani cosmetics'; // doesnt exist with yoox
-          // if(trim($r['libri'])) $collection_array[] = 'Armani libri'; // doesnt exist with yoox
-
-          $createFromName = $t->createCategory($collection_array);
-          //$mergedArray = $t->mergeCategories($collection_array,$createFromName);
-
-          $t->brands_serialized = serialize($createFromName);
-          $t->last_import_data = serialize($r);
-
-          $date = trim($r['opening_date']);
-          $year  = substr($date,0,4);  # extract 4 char starting at position 0.
-          $month = substr($date,4,2);  # extract 2 char starting at position 4.
-          $day   = substr($date,6);
-
-          if(isset($r['opening_date'])) $t->date_opened = date('Y-m-d H:i:s', mktime(0, 0, 0, $month, $day, $year));
+         
           
-          $datec = trim($r['closing_date']);
-          $yearc  = substr($datec,0,4);  # extract 4 char starting at position 0.
-          $monthc = substr($datec,4,2);  # extract 2 char starting at position 4.
-          $dayc   = substr($datec,6);
+          try {
+            //$t = Location::firstOrNew(array('master_id' => $r['master_id']));
+            $t = Location::where('master_id', '=', $r['master_id'])->first();
+              $t->address = $r['address'];
+              $t->city = $r['city'];
+              $t->email_mtm_area_manager = $r['email_mtm_area_manager'];
+              $t->email_mtm_store_manager = $r['email_mtm_store_manager'];
 
-          if(isset($r['closing_date']) && $r['closing_date'] != '47121231') $t->date_closed = date('Y-m-d H:i:s', mktime(0, 0, 0, $monthc, $dayc, $yearc));
-
-          $t->save();
+              $t->save();
+        
+        }catch(\Exception $e){
+            //Do something when query fails. 
+        }
+        
             
         // Loop through all rows
           $row->each(function($cell) {
@@ -600,6 +572,33 @@ class ArmaniController extends BaseController {
         
     });
 	}
+  
+	public function generic_update_all()
+	{
+    
+    $phoneUtils = \libphonenumber\PhoneNumberUtil::getInstance();
+        
+       
+        
+    //echo phone_format("248 982 4247", "US");
+    
+    //$locs = Location::whereNotNull('phone')->get();
+    $locs = Location::all();
+    echo $locs->count();
+    foreach($locs as $key => $v):
+
+      //if(isset($v->country_iso_verified) && $v->phone_verified == NULL):
+        if($v->date_opened == "0000-00-00 00:00:00"){
+          echo $v->master_id." <br>";
+          $v->date_opened = NULL;
+          $v->save();
+        }
+
+
+    endforeach;
+    
+    
+  }
   
 	public function import_postal()
 	{
