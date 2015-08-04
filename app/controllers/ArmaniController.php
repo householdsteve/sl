@@ -236,9 +236,9 @@ class ArmaniController extends BaseController {
 
             $updated_phone = $phoneUtils->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
             //echo $updated_phone."<br>";
-            $updatedloc = Location::find($v->id);
-            $updatedloc->phone_verified = $updated_phone;
-            $updatedloc->save();
+            //$updatedloc = Location::find($v->id);
+            $v->phone_verified = $updated_phone;
+            $v->save();
             
         } catch (\libphonenumber\NumberParseException $e) {
             echo "<pre> master id: ".$v->master_id." : country: ".$v->country_iso_verified; echo "</pre> --------------------------------------------------------------------------------------------";
@@ -650,17 +650,30 @@ class ArmaniController extends BaseController {
           
           $r = $row->all();
           
-          if(isset($r['id_entity'])):
-          //$t = Location::firstOrNew(array('master_id' => $r['id_entity']));
-          $t = Location::where('master_id', '=', $r['id_entity'])->first();
+          echo "<pre>"; print_r($r); echo "</pre>";
           
+          if(isset($r['id_entity'])):
+          
+          
+          try {        
+            //$t = Location::firstOrNew(array('master_id' => $r['id_entity']));
+            $t = Location::where('master_id', '=', $r['id_entity'])->first();
+        
             if($t):
-              echo "<pre>"; print_r($r); echo "</pre>";
+              
           
               $t->co_sign = $r['accompanying_name'];
               $t->address = $r['address'];
+              $t->phone = $r['phone'];
+              $t->postalcode_master = $r['zipcode'];
               $t->save();
             endif;
+            
+          }catch(\Exception $e){
+              //Do something when query fails. 
+              echo "<pre>"; print_r($e); echo "</pre>";
+          }
+            
           endif;
 
         });
